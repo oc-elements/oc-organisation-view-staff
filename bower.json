@@ -5,7 +5,8 @@
   "dependencies": {
     "polymer": "Polymer/polymer#^1.4.0",
     "oc-view-staff": "git://github.com/oc-elements/oc-view-staff.git#1.x",
-    "oc-organisation-api": "git://github.com/oc-elements/oc-organisation-api.git#1.x"
+    "oc-authorization-api": "git://github.com/oc-elements/oc-authorization-api.git#1.x",
+    "oc-user-api": "git://github.com/oc-elements/oc-user-api.git#1.x"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",

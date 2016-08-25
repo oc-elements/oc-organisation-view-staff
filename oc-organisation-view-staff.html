@@ -1,12 +1,13 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../oc-view-staff/oc-view-staff.html">
-<link rel="import" href="../oc-organisation-api/oc-organisation-api.html">
+<link rel="import" href="../oc-authorization-api/oc-authorization-api.html">
+<link rel="import" href="../oc-user-api/oc-user-api.html">
 
 <!--
 `oc-organisation-view-staff`
 Element to manage staff list view on the Ordercloud platform
 
-@demo demo/index.html 
+@demo demo/index.html
 -->
 
 <dom-module id="oc-organisation-view-staff">
@@ -17,7 +18,8 @@ Element to manage staff list view on the Ordercloud platform
       }
     </style>
 
-    <oc-organisation-api id="orgApi"></oc-organisation-api>
+    <oc-authorization-api id="authApi"></oc-authorization-api>
+    <oc-user-api id="userApi"></oc-user-api>
 
     <oc-view-staff items="[[_userList]]" total-items="[[_totalItems]]" page-size="[[_pageSize]]"></oc-view-staff>
 
@@ -38,8 +40,8 @@ Element to manage staff list view on the Ordercloud platform
       },
 
       listeners: {
-//        "reset" : "_resendInvite",
-//        "delete" : "_rejectInvite"
+        "reset" : "_resendInvite",
+        "delete" : "_rejectInvite"
       },
 
       refresh : function(){
@@ -47,7 +49,7 @@ Element to manage staff list view on the Ordercloud platform
       },
 
       _getUsers : function(organisationId){
-        this.$.orgApi.getOrganisationUsers(organisationId)
+        this.$.authApi.getOrganisationMembers(organisationId)
                 .then(function(request){
                   this._userList = request.response.results;
                   this._pageSize = request.response.results.length;
@@ -57,19 +59,19 @@ Element to manage staff list view on the Ordercloud platform
                 .finally(this.set.bind(this, 'loading', false));
       },
 
-//      _resetPassword : function(e){
-//        this.loading = true;
+      _resetPassword : function(e){
+        this.loading = true;
 //        this.$.inviteApi.resendInvite(e.detail.id)
 //                .catch(this.fire.bind(this, 'options_error', 'Could not create option set'))
 //                .finally(this.set.bind(this, 'loading', false));
-//      },
-//
-//      _deleteUser : function(e){
-//        this.loading = true;
+      },
+
+      _deleteUser : function(e){
+        this.loading = true;
 //        this.$.inviteApi.rejectInvite(e.detail.hash)
 //                .catch(this.fire.bind(this, 'options_error', 'Could not create option set'))
 //                .finally(this.set.bind(this, 'loading', false));
-//      }
+      }
 
     });
   </script>
