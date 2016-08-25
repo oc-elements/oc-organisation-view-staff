@@ -1,4 +1,6 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../oc-view-staff/oc-view-staff.html">
+<link rel="import" href="../oc-organisation-api/oc-organisation-api.html">
 
 <!--
 `oc-organisation-view-staff`
@@ -14,7 +16,11 @@ Element to manage staff list view on the Ordercloud platform
         display: block;
       }
     </style>
-    <h2>Hello [[prop1]]</h2>
+
+    <oc-organisation-api id="orgApi"></oc-organisation-api>
+
+    <oc-view-staff items="[[_userList]]" total-items="[[_totalItems]]" page-size="[[_pageSize]]"></oc-view-staff>
+
   </template>
 
   <script>
@@ -23,11 +29,47 @@ Element to manage staff list view on the Ordercloud platform
       is: 'oc-organisation-view-staff',
 
       properties: {
-        prop1: {
-          type: String,
-          value: 'oc-organisation-view-staff',
+        organisationId: Number,
+        loading: {
+          type: Boolean,
+          notify: true
         },
+        _userList : Array
       },
+
+      listeners: {
+//        "reset" : "_resendInvite",
+//        "delete" : "_rejectInvite"
+      },
+
+      refresh : function(){
+        this._getUsers(this.organisationId)
+      },
+
+      _getUsers : function(organisationId){
+        this.$.orgApi.getOrganisationUsers(organisationId)
+                .then(function(request){
+                  this._userList = request.response.results;
+                  this._pageSize = request.response.results.length;
+                  this._totalItems = request.response.count;
+                }.bind(this))
+                .catch(this.fire.bind(this, 'options_error', 'Could not create option set'))
+                .finally(this.set.bind(this, 'loading', false));
+      },
+
+//      _resetPassword : function(e){
+//        this.loading = true;
+//        this.$.inviteApi.resendInvite(e.detail.id)
+//                .catch(this.fire.bind(this, 'options_error', 'Could not create option set'))
+//                .finally(this.set.bind(this, 'loading', false));
+//      },
+//
+//      _deleteUser : function(e){
+//        this.loading = true;
+//        this.$.inviteApi.rejectInvite(e.detail.hash)
+//                .catch(this.fire.bind(this, 'options_error', 'Could not create option set'))
+//                .finally(this.set.bind(this, 'loading', false));
+//      }
 
     });
   </script>

@@ -3,7 +3,9 @@
   "description": "Element to manage staff list view on the Ordercloud platform",
   "main": "oc-organisation-view-staff.html",
   "dependencies": {
-    "polymer": "Polymer/polymer#^1.4.0"
+    "polymer": "Polymer/polymer#^1.4.0",
+    "oc-view-staff": "git://github.com/oc-elements/oc-view-staff.git#1.x",
+    "oc-organisation-api": "git://github.com/oc-elements/oc-organisation-api.git#1.x"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
