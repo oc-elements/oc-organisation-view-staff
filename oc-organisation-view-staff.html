@@ -52,7 +52,6 @@ Element to manage staff list view on the Ordercloud platform
       _getUsers : function(organisationId){
         this.$.authApi.getOrganisationMembers(organisationId)
                 .then(function(request){
-                  console.log(request.response.results)
                   this._userList = request.response.results;
                   this._pageSize = request.response.results.length;
                   this._totalItems = request.response.count;
