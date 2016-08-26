@@ -40,17 +40,19 @@ Element to manage staff list view on the Ordercloud platform
       },
 
       listeners: {
-        "reset" : "_resendInvite",
-        "delete" : "_rejectInvite"
+        "reset" : "_resetPassword",
+        "delete" : "_deleteUser"
       },
 
       refresh : function(){
         this._getUsers(this.organisationId)
+        this._getGroupIds(this.organisationId)
       },
 
       _getUsers : function(organisationId){
         this.$.authApi.getOrganisationMembers(organisationId)
                 .then(function(request){
+                  console.log(request.response.results)
                   this._userList = request.response.results;
                   this._pageSize = request.response.results.length;
                   this._totalItems = request.response.count;
@@ -59,18 +61,47 @@ Element to manage staff list view on the Ordercloud platform
                 .finally(this.set.bind(this, 'loading', false));
       },
 
+      _getGroupIds : function(organisationId){
+        this.loading = true;
+        this.$.authApi.getOrganisationGroups(organisationId)
+                .then(function(request){
+                  this._groups = request.response.results;
+                }.bind(this))
+                .catch(this.fire.bind(this, 'options_error', 'Could not create option set'))
+                .finally(this.set.bind(this, 'loading', false));
+      },
+
       _resetPassword : function(e){
         this.loading = true;
-//        this.$.inviteApi.resendInvite(e.detail.id)
-//                .catch(this.fire.bind(this, 'options_error', 'Could not create option set'))
-//                .finally(this.set.bind(this, 'loading', false));
+        this.$.userApi.resetPassword(e.detail.user.id)
+                .catch(this.fire.bind(this, 'options_error', 'Could not create option set'))
+                .finally(this.set.bind(this, 'loading', false));
       },
 
       _deleteUser : function(e){
         this.loading = true;
-//        this.$.inviteApi.rejectInvite(e.detail.hash)
-//                .catch(this.fire.bind(this, 'options_error', 'Could not create option set'))
-//                .finally(this.set.bind(this, 'loading', false));
+
+        var userGroups = e.detail.groups;
+        var userId = String(e.detail.user.id);
+        var customerGroupObj = this._groups.filter(function(obj){ return (obj.name === "Customers")})[0];
+
+        var promises = userGroups.map(function(obj){
+          if(obj.id !== customerGroupObj.id) {
+            return this.$.authApi.removeOrganisationMembers(this.organisationId, obj.id, [userId])
+          }
+        }, this);
+
+        if(!userGroups.filter(function(obj){ return (obj.name === "Customers")})[0]){
+          promises.push(this.$.authApi.addOrganisationMembers(this.organisationId, customerGroupObj.id, [userId]));
+        }
+
+
+        Promise.all(promises)
+                .then(function(){
+                  this._getUsers(this.organisationId);
+                }.bind(this))
+                .catch(this.fire.bind(this, 'options_error', 'Could not create option set'))
+                .finally(this.set.bind(this, 'loading', false));
       }
 
     });
